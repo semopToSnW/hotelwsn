@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <package name="member" namespace="/member" extends="default">
+    	<action name="login" class="hotel.action.MemberAction" method="login">
+    		<result name="AM">/jsp/mainPages/asp.jsp</result>
+    		<result name="HO">/jsp/mainPages/hotelManager.jsp</result>
+    		<result name="TM">/jsp/mainPages/tour.jsp</result>
+    		<result name="NoInfo">/jsp/init/noInfo.jsp</result>
+    		<result name="secondStep">/jsp/init/secondStep.jsp</result>    		
+    		<result name="finalStep">/jsp/init/finalStep.jsp</result> 
+    		<result name="error">/jsp/index.jsp</result>
+    	</action>
+    	<!-- 로그아웃 미완성 -->
+    	<action name="logout">
+    		<result type="redirect">/jsp/index.jsp</result>
+    	</action>
+    	<action name="goInsertPage" class="hotel.action.MemberAction" method="goInsertPage">
+    		<result name="asp">/jsp/idInsertPages/aspInsert.jsp</result>
+    		<result name="hotel">/jsp/idInsertPages/hotelInsert.jsp</result>
+    		<result name="tour">/jsp/idInsertPages/tourInsert.jsp</result>
+    	</action>
+    	<action name="searchCompany" class="hotel.ajax.SearchCompanyAjax" method="searchCompany">
+    		<result name="success" type="json"></result>
+    	</action>
+    	<action name="searchCompanyById" class="hotel.ajax.SearchCompanyAjax" method="searchCompanyById">
+    		<result type="json"></result>
+    	</action>
+    	<action name="join" class="hotel.action.MemberAction" method="join">
+    		<result type="redirect">/jsp/mainPages/asp.jsp</result>
+    	</action>
+    	<action name="goPasswordForm">
+    		<result>/jsp/idInsertPages/createPassword.jsp</result>
+    	</action>
+    	<action name="createPassword" class="hotel.action.MemberAction" method="createPassword">
+    		<result name="success">/jsp/index.jsp</result>
+    		<result name="error">/jsp/idInsertPages/createPassword.jsp</result>
+    	</action>
+    	<action name="showSearchForm" class="hotel.action.MemberAction" method="showSearchForm">
+    		<result>/jsp/idInsertPages/searchForm.jsp</result>
+    	</action>
+    </package>
+</struts>
+

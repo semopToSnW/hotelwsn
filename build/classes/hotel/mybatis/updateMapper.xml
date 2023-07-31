@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hotel.mybatis.updateMapper">
+	<update id="updatePassword" parameterType="User">
+		update "USER" set pw=#{pw} where id=#{id}
+	</update>
+	<update id="completeCompanySetting" parameterType="string">
+		update company set InfoCompleted='true' where id=#{companyId}
+	</update>
+	
+	<!-- 재학 -->
+	<update id="onoffChangeHotel" parameterType="map">
+		UPDATE DAYROOM SET HOTEL_ONOFF=#{onoff} WHERE ID=#{dayRoom_id}
+	</update>
+	
+	<update id="onoffChangeOTA" parameterType="map">
+		UPDATE DAYROOM SET TOUR_ONOFF=#{onoff} WHERE ID=#{dayRoom_id}
+	</update>
+	
+	<update id="AssignChange" parameterType="map">
+		UPDATE DAYROOM SET HOTEL_ASSIGN=#{hotelAssign},TOUR_ASSIGN=#{OTAAssgin} WHERE ID=#{dayRoom_id}
+	</update>
+	<update id="updateMyPage" parameterType="map">
+		update dayroom 
+		set rank_type = #{rankType}, price=#{price}
+		where room_id = (select id from room where hotel_id=#{companyId} and type=#{type})
+		and to_char("Date",'YYYY') = #{year}
+		and to_char("Date",'fmMM') = #{month}
+		and to_char("Date",'fmDD') = #{dayOfMonth}
+	</update>
+	
+	<update id="updateSatus" parameterType="string">
+	update status set status.STATUS_NAME='체크아웃' 
+	where status.reservation_id = any(select reservation.id 
+	from reservation, "USER" where sysdate > checkout and reservation.reg_person="USER".id and 
+	"USER".company_id=#{companyId})
+	</update>
+
+	<update id="modifyPriceAndRank" parameterType="map">
+		UPDATE dayroom a SET a.RANK_TYPE = #{rankType}, a.price= #{price}
+ 		WHERE a.ROOM_ID IN (SELECT b.id FROM room b WHERE b.id = a.room_id and b.type=#{type} and b.hotel_id=#{companyId})
+ 		and to_char(a."Date",'yyyy-mm-dd') = #{startDate}
+	</update>
+	<!-- 생셩:김명희
+	요금 수정 -->
+	<update id="changePrice" parameterType="map">
+		UPDATE dayroom a SET a.price= #{price}
+ 		WHERE a.ROOM_ID IN (SELECT b.id FROM room b WHERE b.id = a.room_id and b.type=#{type} and b.hotel_id=#{companyId})
+ 		and to_char(a."Date",'yyyy-mm-dd') = #{startDate}
+	</update>
+</mapper>
+

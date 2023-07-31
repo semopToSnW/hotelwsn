@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hotel.mybatis.insertMapper">
+	
+	<insert id="sendMessage" parameterType="Message">
+	insert into message(id, title <if test="content!=null">, content</if><if test="file!=null">, "file", filename, contentType</if>
+	,"to","from") values(SEQ_MESSAGE_id.nextval, #{title}
+	<if test="content!=null">,#{content} </if><if test="file!=null">, #{file}, #{fileName}, #{contentType}</if>
+	,#{to}, #{from}
+	)
+	</insert>
+	<insert id="insertCompany" parameterType="Company">
+	insert into company(
+	<if test="id!=null">ID</if>,NAME<if test="group!=null">,"Group"</if>
+	,CEO ,PHONE ,EMAIL ,ADDR ,REGDATE) values(
+	<if test="id!=null">#{id}</if>,#{name}<if test="group!=null">,#{group}</if>
+	,#{ceo},#{phone},#{email},#{addr},sysdate)
+	</insert>
+	
+	<insert id="insertUser" parameterType="User">
+	insert into "USER"(id
+	<if test="pw!=null">
+	,pw
+	</if>
+	,regdate 
+	<if test="contractperiod!=null">
+	,contractperiod
+	</if>
+	<if test="company_id!=null">
+	,company_id
+	</if>
+	) values(#{id}
+	<if test="pw!=null">
+	,#{pw}
+	</if>
+	,sysdate
+	<if test="contractperiod!=null">
+	,#{contractperiod}
+	</if>
+	<if test="company_id!=null">
+	,#{company_id}
+	</if>
+	)
+	</insert>
+	
+	<insert id="insertConnection" parameterType="Connection">
+		insert all
+		<foreach collection="ota_id" item="item">
+			into connection (hotel_id, ota_id) values (#{hotel_id}, #{item}) 
+		</foreach>
+		select * from dual
+	</insert>
+	
+	<insert id="insertRoom" parameterType="java.util.ArrayList">
+		insert all
+		<foreach collection="list" item="room">
+			into room(type,amount,persons,hotel_assign,tour_assign,hotel_id) values (#{room.type},#{room.amount},#{room.persons},#{room.hotel_assign},#{room.tour_assign},#{room.hotel_id})
+		</foreach>
+		select * from dual
+	</insert>
+	
+	<insert id="insertRank" parameterType="java.util.ArrayList"> 
+		insert all
+		<foreach collection="list" item="rank">
+			 into rank(type,price,room_id) values (#{rank.type},#{rank.price},#{rank.room_id})
+		</foreach>
+		select * from dual
+	</insert>
+	
+	<insert id="insertDayroom" parameterType="java.util.ArrayList">
+		insert all
+		<foreach collection="list" item="dayroom">
+		into dayroom("Date", hotel_assign, tour_assign, price, room_id, rank_type) values(TO_DATE(#{dayroom.date}),#{dayroom.hotel_assign},#{dayroom.tour_assign},
+		(select rank.price from rank, room where room.id=#{dayroom.room_id} and rank.type=#{dayroom.rank_type} and rank.room_id=room.id)
+		,#{dayroom.room_id}, #{dayroom.rank_type})
+		</foreach>
+		select * from dual
+	</insert>
+	<insert id="insertReservation" parameterType="Reservation" >
+		insert into reservation
+		(CheckIn, CheckOut, Persons, RegDate, StayPerson, Res_Person, Nation, Phone, Memo, Reg_Person)
+		VALUES
+		(#{checkin}, #{checkout}, #{persons}, sysdate, #{stayPerson}, #{res_person}, #{nation}, #{phone}, #{memo}, #{reg_person})
+		<selectKey keyProperty="id" resultType="int" order="AFTER">
+			SELECT SEQ_RESERVATION_ID.currval FROM dual
+		</selectKey>
+	</insert>
+	
+	<insert id="insertRes_group" parameterType="list">
+		insert all
+		<foreach collection="list" item="item">
+			into res_group (dayroom_id, reservation_id, price, hotel_room_count, tour_room_count, product_id) values(#{item.dayRoom_id}, #{item.reservation_id}, #{item.price}, #{item.hotel_room_count}, #{item.tour_room_count} 
+			<if test="item.product_id==0">
+			,null)
+			</if>
+			<if test="item.product_id!=0">
+			,#{item.product_id})
+			</if>
+		</foreach>
+		select * from dual
+	</insert>
+	
+	<insert id="insertProduct" parameterType="Product">
+	insert into Product(name,explain,saleStart, saleFinish ,mealTypes,checkInTime,checkOutTime,amount,prices,RoomTypes,company_id) values
+	(#{name},#{explain}, to_date(#{saleStart}, 'MM/DD/YYYY'), to_date(#{saleFinish}, 'MM/DD/YYYY'), #{mealTypes},#{checkInTime},#{checkOutTime},#{amount},#{prices},#{roomTypes},#{company_id}) 
+		<selectKey keyProperty="id" resultType="int" order="AFTER">
+			SELECT SEQ_PRODUCT_ID.currval FROM DUAL
+		</selectKey>			
+	</insert>	
+	
+	<insert id="insertImage" parameterType="java.util.ArrayList">
+	insert all 	
+		<foreach collection="list" item="item">
+		into image (picture,filename,explain,product_id, picnum, title) 
+	    values(#{item.picture},#{item.filename},#{item.explain},#{item.product_id},#{item.picnum}, #{item.title})
+		</foreach> 	
+		select * from dual 
+	</insert>
+	
+	<!--dayroom 지난 데이터 insert-->
+	<insert id="insertstatus" parameterType="int">
+		INSERT INTO STATUS(RESERVATION_ID, STATUS_NAME)
+		VALUES(#{id},'예약')
+	</insert>
+</mapper>
+

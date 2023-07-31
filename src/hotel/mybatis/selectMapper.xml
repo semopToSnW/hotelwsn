@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hotel.mybatis.selectMapper">
+	<select id="getUser" parameterType="string" resultType="User">	
+		select * from "USER" where id=#{id}
+	</select>
+	<select id="getUserNumber" parameterType="string" resultType="int">	
+		select SUBSTR(ID, 3,5)+1 from "USER" WHERE id LIKE #{type} AND ROWNUM=1 ORDER BY ID DESC
+	</select>
+	<select id="getCompanyNumber" parameterType="string" resultType="int">	
+		select SUBSTR(ID, 3,5)+1 from COMPANY WHERE id LIKE #{type} AND ROWNUM=1 ORDER BY ID DESC
+	</select>
+	<select id="selectAllTour" resultType="Company">	
+		select * from company where id like 'TC%'
+	</select>
+	<select id="searchCompany" resultType="Company" parameterType="map">	
+		select * from company where name like #{name} and id like #{type}
+	</select>
+	<select id="searchCompanyById" resultType="Company" parameterType="string">	
+		select * from company where id=#{id}
+	</select>
+	<select id="searchRoom" resultType="Room" parameterType="string">
+		select room.* from (select * from "USER" where company_id=#{companyId}) u, room where u.company_id = room.hotel_id
+	</select>
+	<select id="searchRank" resultType="Rank" parameterType="int">
+			select * from (select * from room where id=#{roomId}) s, rank where rank.room_id = s.id
+	</select>
+	<select id="searchDayroom" resultType="DayRoom" parameterType="int">
+		select * from (select * from room where id=#{roomId}) s, dayroom where s.id = dayroom.room_id
+	</select>
+	<select id="getRanksByCompany_id" resultType="Rank" parameterType="string">
+			SELECT RANK.* FROM RANK, ROOM WHERE ROOM.HOTEL_ID=#{companyID} AND RANK.ROOM_ID=ROOM.ID
+	</select>
+	<select id="getRoomsByCompany_id" resultType="Room" parameterType="string">
+			SELECT * FROM ROOM WHERE HOTEL_ID=#{companyID}
+	</select>
+	<select id="getHotelRanksNumber" resultType="string" parameterType="string">
+			select DISTINCT RANK.TYPE from room, rank where room.hotel_id=#{companyID} AND RANK.ROOM_ID=ROOM.ID ORDER BY RANK.TYPE ASC
+	</select>
+	<select id="getRanksByTypeAndHotelId" resultType="Rank" parameterType="map">
+		select rank.* from rank, (select * from room where type=#{roomType} and hotel_id=#{companyId}) a where a.id=rank.ROOM_ID  order by rank.type asc
+	</select>
+	<!-- 생성:재학 
+	호텔 측 로그인 후 보여질 첫 화면의 3달치 날짜별 정보-->
+	<select id="getSimpleCarendar" parameterType="hashmap" resultType="DayRoom">			
+		select DAYROOM.id, to_char(dayroom."Date", 'YYYY.mm.DD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price, 	
+		DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type, ROOM.TYPE ROOM_TYPE from DAYROOM, ROOM, COMPANY 
+		where DAYROOM.ROOM_ID = ROOM.ID AND ROOM.HOTEL_ID=COMPANY.ID AND COMPANY.ID=#{hotel_id} 
+		AND ROOM.TYPE=#{room_type}
+		AND "Date">=#{startMonth} AND (ADD_MONTHS(#{startMonth},3))>"Date" and "Date">=sysdate-1
+	</select>
+	<!-- 생성:재학 
+	호텔이 가지고 있는 방 타입을 반환-->		
+	<select id="getRoomType" parameterType="string" resultType="string">	
+		SELECT TYPE FROM ROOM WHERE HOTEL_ID=#{hotel_id}
+	</select>
+	<!-- 생성:재학 
+	호텔과 제휴 맺은 여행사 목록을 반환-->	
+	<select id="getOTAList" parameterType="string" resultType="string">	
+		SELECT OTA_ID FROM CONNECTION WHERE HOTEL_ID=#{hotel_id}
+	</select>
+	
+	<select id="getDayRoomsByCompany_idAndMonth" resultType="DayRoom" parameterType="map">
+		SELECT DAYROOM.id, to_char(dayroom."Date", 'YYYY.mm.DD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price, 	
+		DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type 
+		FROM DAYROOM, ROOM WHERE DAYROOM.ROOM_ID=ROOM.ID AND ROOM.HOTEL_ID=#{companyId} AND to_char(dayroom."Date", 'MM')=#{month}
+	</select>
+	 <select id="getDayRoomsDatesAndTypesByCompany_idAndMonth" resultType="DayRoom" parameterType="map">
+		select distinct "date", rank_type from (SELECT DAYROOM.id, to_char(dayroom."Date", 'YYYY.mm.DD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price, 	
+		DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type 
+		FROM DAYROOM, ROOM WHERE DAYROOM.ROOM_ID=ROOM.ID AND ROOM.HOTEL_ID=#{companyId} AND to_char(dayroom."Date", 'YYYY')=#{year} AND to_char(dayroom."Date", 'MM')=#{month}) dr
+	</select>  
+	<select id="selectCompany" resultType="Company" parameterType="String">
+		select * from company where id=#{companyId}
+	</select>
+	
+<!-- 	<select id="selectResInit" resultType ="ResInit" parameterType="map">
+		 select room.HOTEL_ID, room."TYPE", DAYROOM."Date", dayroom.rank_type, rank.price 
+		 from dayroom, rank, room
+    		where room.id=dayroom.ROOM_ID 
+         	and room.HOTEL_ID=${companyId} 
+          	and rank.ROOM_ID=room.id
+         	and rank.type=dayroom.rank_type and 
+         	<foreach collection="dayRoomList" item="droom" separator="or" open="(" close=")">
+         	 DAYROOM."Date"=%{droom.date}
+         	</foreach>
+   		order by room."TYPE" asc;	
+	</select> -->
+	
+	<select id="getADayRoom" resultType="DayRoom" parameterType="string">
+		select id, to_char("Date", 'YYYY.fmMM.fmfmDD') as "Date", hotel_assign, tour_assign, price, hotel_onoff, tour_onoff, room_id, rank_type	
+		from dayRoom where id=#{dayRoomId}
+	</select>
+	
+	<select id="getDayRoomsByCompany_idAndMonthAndRoomType" resultType="DayRoom" parameterType="map">
+		select distinct "date", id, type as "room_type", rank_type, hotel_assign, tour_assign, hotel_onoff, tour_onoff from 
+		(SELECT DAYROOM.id, room.type, to_char(dayroom."Date", 'YYYY.fmMM.fmfmDD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price,DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type 
+		FROM DAYROOM, ROOM WHERE DAYROOM.ROOM_ID=ROOM.ID AND ROOM.HOTEL_ID=#{companyId} AND to_char(dayroom."Date", 'YYYY')=#{year} AND to_char(dayroom."Date", 'fmMM')=#{month} and
+		<foreach collection="types" item="item" separator="or" open="(" close=")">
+			room.type=#{item.type} 
+		</foreach>	
+		) dr	
+	</select>
+	
+	<select id="getReservationInit" resultType="ReservationInfo" parameterType="map">
+	select dayroom.id as "dayroom_id", to_char(dayroom."Date", 'YYYY.fmMM.fmfmDD') as "Date", room.persons, room.type as "room_type", ra.type as "rank_type", ra.price, dayroom.hotel_assign, dayroom.tour_assign 
+	from dayroom, room, 
+  	(select rank.type, rank.price, rank.room_id from rank, 
+      (select ID from room where hotel_id=#{companyId} AND 
+      <foreach collection="roomList" item="item" separator="or" open="(" close=")">
+	  		TYPE=#{item.type}
+	  </foreach>	     
+      )ro where rank.room_id = ro.id) ra 
+	where room.id=ra.room_id and ra.room_id=dayroom.room_id and dayroom.rank_type=ra.type AND 
+	  <foreach collection="dateList" item="item" separator="or" open="(" close=")">
+	  	to_char(DAYROOM."Date", 'YYYY.fmmm.fmfmDD')=#{item}
+	  </foreach>
+	  order by dayroom."Date" asc
+	</select>
+	
+	<select id="getRankTypesByCompanyId" resultType="Rank" parameterType="string">
+		select distinct rank.type, rank.price from rank, room where room.hotel_id=#{companyId} AND ROOM.ID=RANK.ROOM_ID group by rank.type, rank.price
+	</select>
+
+	<select id="getReservationInitInMain" resultType="ReservationInfo" parameterType="int">
+	select dayroom.id as "dayroom_id", to_char(dayroom."Date", 'YYYY.fmMM.fmfmDD') as "Date", room.persons, room.type as "room_type", rank.type as "rank_type", rank.price, dayroom.hotel_assign 
+	from dayroom, room, rank
+	where room.id=rank.room_id 
+	and rank.room_id=dayroom.room_id 
+	and dayroom.rank_type=rank.type 
+	AND dayroom.id=#{dayRoomId}
+	</select>
+		<select id="getImage" resultType="Image" parameterType="String">
+		select * from image where product_id=#{product_id}
+	</select>
+	
+	<select id="getProduct" resultType="Product">
+		  select id, name, explain, mealtypes, checkintime, checkouttime, amount, prices, roomtypes, company_id, to_char(salestart, 'YYYY.fmmm.fmfmDD') as salestart, to_char(salefinish, 'YYYY.fmMM.fmfmDD') as salefinish 
+		  from product where company_id=#{companyId}
+	</select>
+	<select id="getProductById" resultType="Product">
+		select id, name, explain, mealtypes, checkintime, checkouttime, amount, prices, roomtypes, company_id, to_char(salestart, 'YYYY.fmmm.fmfmDD') as salestart, to_char(salefinish, 'YYYY.fmMM.fmfmDD') as salefinish 
+		  from product where id=#{id}
+	</select>
+	<select id="getDayRoomByProduct" resultType="DayRoom" parameterType="map">
+		select DISTINCT DROOM.id, to_char(DROOM."Date", 'YYYY.fmmm.fmfmDD') as "date", DROOM.hotel_assign, DROOM.tour_assign, DROOM.price, 	
+		DROOM.hotel_onoff, DROOM.tour_onoff, DROOM.room_id, DROOM.rank_type from (select dayroom.* from dayroom, (select * from product where id=#{id}) product, room where dayroom."Date" between product.saleStart and product.saleFinish) droom, room
+		where room.id=droom.room_id and room.type=#{type} AND room.hotel_id=#{companyId}
+	</select>
+	
+	<select id="getProductsByCompanyIdAndDate" resultType="Product" parameterType="map">
+		select id, name, explain, mealtypes, checkintime, checkouttime,amount, prices, roomtypes, company_id, to_char(salestart, 'YYYY.fmmm.fmfmDD') as salestart, to_char(salefinish, 'YYYY.fmMM.fmfmDD') as salefinish from product where company_id=#{companyId} 
+		<foreach collection="dateList"  item="item"  separator="or" open="and" >
+		 (to_date(#{item}, 'YYYY.fmmm.fmfmDD') >= salestart and salefinish >= to_date(#{item}, 'YYYY.fmmm.fmfmDD'))
+		</foreach>
+		<foreach collection="roomList"  item="item"  separator="or" open="and(" close=")">
+		 roomtypes like '%'||#{item.type}||'%'
+		</foreach>
+	</select>
+	
+	<select id="getRoomRank" resultType="RoomRank" parameterType="string">
+		select rank.id as "rank_id", rank.type as "rank_type", rank.price as "rank_price", room.type as "room_type"
+		from rank, room where room.id = rank.room_id and room.hotel_id=#{companyId}
+	</select>
+	
+	<select id ="getReservation" resultType="Reservation" parameterType="map">
+		select 
+		b2.id,
+		to_char(b2.checkin, 'YYYY.fmMM.fmfmDD') as "checkin",
+		to_char(b2.checkout, 'YYYY.fmMM.fmfmDD') as "checkout",
+		b2.persons,
+		to_char(b2.regDate, 'YYYY.fmMM.fmfmDD') as "regDate",
+		to_char(b2.renewDate, 'YYYY.fmMM.fmfmDD') as "renewDate",
+		b2.stayPerson,
+		b2.res_person,
+		b2.nation,
+		b2.phone,
+		b2.memo,
+		b2.reg_person,
+		b2.renewPerson,
+		b2.status_name
+		 from (select rownum rn, b.* from 
+		 (select reservation.*, status.status_name 
+		  from reservation, "USER", status 
+		  WHERE "USER".COMPANY_ID=#{companyId} 
+		  AND "USER".ID=RESERVATION.REG_PERSON 
+		  and status.reservation_id=reservation.id 
+		   <if test="checkin!=null">
+			and checkin>=to_date(#{checkin}, 'MM/DD/YYYY') order by reservation.checkin asc
+			</if>
+			<if test="checkout!=null">
+				and checkout>=to_date(#{checkout}, 'MM/DD/YYYY')  order by reservation.checkout asc
+			</if> 
+			 <if test="regDate!=null">
+				order by reservation.regDate desc
+			</if>
+			<if test="checkin==null and checkout==null and regDate==null">
+				order by reservation.regDate desc
+			</if>
+		 ) 
+		 b) b2 where rn between #{from} and #{to}
+	  	<if test="regDate!=null">
+			and B2.regDate>=to_date(#{regDate}, 'MM/DD/YYYY')
+		</if>
+		order by b2.rn
+	</select>
+<!-- 	getDayRoomsByDayRoomIds -->
+
+	<select id="getTotalPage" parameterType="map" resultType="int">
+		select ceil(count(*)/#{pageAmount}) from reservation, "USER" where "USER".COMPANY_ID=#{companyId} AND "USER".ID= RESERVATION.REG_PERSON
+	</select>
+
+	<!--싱미 /사용자정의 No:ho-fro-049 / 05010(일 am1:00) 로그인한 호텔의 예약가지고 오기  출력되는지 확인하려고 사용함-->
+	
+	
+	<!--//싱미 / 사용자정의 No:ho-fro-051/ 15.05.11(월 am10:39) 방예약된을 예약날짜로 검색합니다. -->
+	<select id="reservedDateSearch" parameterType="String"  resultType="Reservation">
+		select reservation.id "id",
+			   reservation.regdate "regdate",
+			   reservation.checkin "checkin",
+			   reservation.checkout "checkout",
+			   reservation.stayperson "stayPerson", 
+			   reservation.res_person "res_person",
+			   reservation.reg_person "reg_Person",
+			   reservation.renewperson "renewPerson"
+		from reservation
+		where to_char(regdate,'yyyy-mm-dd')=#{regdate} order by regdate desc
+		
+	</select>
+	<!-- 방예약된 체크인 체크아웃날짜로 검색 -->
+	<select id="checkinCheckoutSearch" parameterType="map"  resultType="Reservation">
+	    select reservation.id "id",
+			   reservation.regdate "regdate",
+			   reservation.checkin "checkin",
+			   reservation.checkout "checkout",
+			   reservation.stayperson "stayPerson", 
+			   reservation.res_person "res_person",
+			   reservation.reg_person "reg_Person",
+			   reservation.renewperson "renewPerson"
+		from reservation
+		where to_char(checkin,'yyyy-mm-dd')=#{checkin} and to_char(checkout,'yyyy-mm-dd')=#{checkout} order by checkout desc
+	</select>
+	
+	<!--예약받은 직원으로 검색  -->
+	<select id = "goRegistPersonSearch" parameterType="String" resultType="Reservation">
+		select reservation.id "id",
+			   reservation.regdate "regdate",
+			   reservation.checkin "checkin",
+			   reservation.checkout "checkout",
+			   reservation.stayperson "stayPerson", 
+			   reservation.res_person "res_person",
+			   reservation.reg_person "reg_Person",
+			   reservation.renewperson "renewPerson"
+		from reservation
+		where reg_person = #{reg_person} order by reg_person desc
+	</select>
+	<!-- 예약한 손님으로 검색 -->
+	<select id="goReservationPersonSearch" parameterType="String" resultType="Reservation">
+		select reservation.id "id",
+			   reservation.regdate "regdate",
+			   reservation.checkin "checkin",
+			   reservation.checkout "checkout",
+			   reservation.stayperson "stayPerson", 
+			   reservation.res_person "res_person",
+			   reservation.reg_person "reg_Person",
+			   reservation.renewperson "renewPerson"
+		from reservation
+		where res_person = #{res_person} order by res_person desc
+	</select>
+	<!-- 숙박 손님으로 검색 -->
+	<select id="goStayPersonSearch" parameterType="String" resultType="Reservation">
+		select reservation.id "id",
+			   reservation.regdate "regdate",
+			   reservation.checkin "checkin",
+			   reservation.checkout "checkout",
+			   reservation.stayperson "stayPerson", 
+			   reservation.res_person "res_person",
+			   reservation.reg_person "reg_Person",
+			   reservation.renewperson "renewPerson"
+		from reservation
+		where stayPerson = #{stayPerson} order by stayPerson desc
+	</select>
+
+	
+	<!-- 객실 관리 -->		
+	<select id="getOTANameList" parameterType="string" resultType="string">	
+		SELECT COMPANY.NAME 
+		FROM CONNECTION, COMPANY 
+		WHERE CONNECTION.OTA_ID = COMPANY.ID AND CONNECTION.HOTEL_ID = #{hotel_id}
+	</select>
+	
+	<select id="getOTANameListByOTA_Name" resultType="string" parameterType="map">
+		SELECT COMPANY.NAME 
+		FROM CONNECTION, COMPANY 
+		WHERE CONNECTION.OTA_ID = COMPANY.ID 
+		AND CONNECTION.HOTEL_ID = #{hotel_id} 
+		AND LOWER(COMPANY.NAME) LIKE LOWER(#{OTA_Name})		
+	</select>
+		
+	<select id="getRoomAmount_All" resultType="hotel.vo.RoomAmount" parameterType="map">
+		SELECT DAYROOM."Date", SUM(ROOM.AMOUNT) sum_RoomAmount, 
+			SUM(DAYROOM.HOTEL_ASSIGN) sum_HotelAmount, SUM(DAYROOM.TOUR_ASSIGN) sum_OTAAmount
+		FROM DAYROOM, ROOM
+		WHERE DAYROOM.ROOM_ID = ROOM.ID 
+  			AND ROOM.HOTEL_ID = #{hotel_id}
+  			AND DAYROOM."Date" >= #{time}
+  			AND TO_DATE(#{time},'YYYY/MM/DD') +14 > DAYROOM."Date" 
+  		GROUP BY DAYROOM."Date"
+  		ORDER BY DAYROOM."Date" ASC 
+	</select>
+		
+	<select id="getRoomAmount_ByType" resultType="hotel.vo.RoomAmount" parameterType="map">
+		SELECT DAYROOM."Date", ROOM.AMOUNT sum_RoomAmount,  DAYROOM.HOTEL_ASSIGN sum_HotelAmount, DAYROOM.TOUR_ASSIGN sum_OTAAmount, 
+			DAYROOM.HOTEL_ONOFF hotel_onoff, DAYROOM.TOUR_ONOFF tour_onoff, ROOM.HOTEL_ASSIGN def_HotelAmount, ROOM.TOUR_ASSIGN def_OTAAmount, DAYROOM.ID dayRoom_id 
+		FROM DAYROOM, ROOM
+		WHERE DAYROOM.ROOM_ID = ROOM.ID 
+  		AND ROOM.HOTEL_ID = #{hotel_id}
+  		AND ROOM.TYPE = #{room_Type}
+  		AND DAYROOM."Date" >= #{time}
+  		AND TO_DATE(#{time},'YYYY/MM/DD') +14 > DAYROOM."Date"
+  		ORDER BY DAYROOM."Date" ASC
+	</select>
+	
+	<select id="getRoomSoldAmount_EachOTA" resultType="int" parameterType="map">
+		SELECT NVL( SUM(RES_GROUP.TOUR_ROOM_COUNT),0 )  
+  		FROM  RESERVATION, RES_GROUP, DAYROOM, ROOM, "USER", COMPANY
+  		WHERE RESERVATION.REG_PERSON="USER".ID 
+  		AND RESERVATION.ID = RES_GROUP.RESERVATION_ID
+  		AND DAYROOM.ID=RES_GROUP.DAYROOM_ID
+  		AND ROOM.ID=DAYROOM.ROOM_ID
+  		AND ROOM.TYPE=#{room_Type}  
+  		AND "USER".COMPANY_ID=COMPANY.ID
+  		AND COMPANY.NAME=#{OTAName} 
+  		AND TO_DATE(#{time},'YYYY/MM/DD') + #{days} >= RESERVATION.CHECKIN
+  		AND RESERVATION.CHECKOUT > TO_DATE(#{time},'YYYY/MM/DD') + #{days}
+  		AND DAYROOM."Date" = TO_DATE(#{time},'YYYY/MM/DD') + #{days}
+	</select>
+	
+	<select id="sumAssignDayroom" resultType="int" parameterType="String">
+		SELECT SUM(DAYROOM.HOTEL_ASSIGN+DAYROOM.TOUR_ASSIGN) FROM DAYROOM WHERE ID=#{dayRoom_id}
+	</select>
+	
+	<select id="roomSoldAmount_All" resultType="hotel.vo.RoomSoldAmount" parameterType="map">
+		SELECT to_char(DAYROOM."Date",'yyyy-mm-dd') "date",SUM(NVL(RES_GROUP.HOTEL_ROOM_COUNT,0)) sum_HotelAmount, SUM(NVL(RES_GROUP.TOUR_ROOM_COUNT,0)) sum_OTAAmount
+  		FROM  RES_GROUP, DAYROOM, ROOM 
+   		WHERE RES_GROUP.DAYROOM_ID = DAYROOM.ID
+      	AND DAYROOM."Date" >= #{time}
+     	AND TO_DATE(#{time},'YYYY/MM/DD') +14 > DAYROOM."Date" 
+     	AND DAYROOM.ROOM_ID = ROOM.ID
+      	AND ROOM.HOTEL_ID = #{hotel_id}
+      	GROUP BY DAYROOM."Date"
+      	ORDER BY DAYROOM."Date" ASC
+	</select>
+	
+	<select id="roomSoldAmount_ByType" resultType="hotel.vo.RoomSoldAmount" parameterType="map">
+		SELECT to_char(DAYROOM."Date",'yyyy-mm-dd') "date",SUM(NVL(RES_GROUP.HOTEL_ROOM_COUNT,0)) sum_HotelAmount, SUM(NVL(RES_GROUP.TOUR_ROOM_COUNT,0)) sum_OTAAmount
+  		FROM  RES_GROUP, DAYROOM, ROOM
+   		WHERE RES_GROUP.DAYROOM_ID = DAYROOM.ID
+     	AND DAYROOM."Date" >= #{time}
+      	AND TO_DATE(#{time},'YYYY/MM/DD') +14 > DAYROOM."Date"
+      	AND DAYROOM.ROOM_ID = ROOM.ID
+      	AND ROOM.HOTEL_ID = #{hotel_id}
+      	AND ROOM.TYPE = #{room_Type}
+      	GROUP BY DAYROOM."Date"
+      	ORDER BY DAYROOM."Date" ASC
+	</select>
+	
+	<select id="getOneDayRoom" resultType="hotel.vo.RoomAmount" parameterType="String">
+		SELECT DAYROOM.ID dayRoom_id, hotel_onoff,tour_onoff,HOTEL_ASSIGN sum_HotelAmount,TOUR_ASSIGN sum_OTAAmount
+  		FROM DAYROOM WHERE DAYROOM.ID =  #{dayRoom_id}  
+	</select>
+	
+	<select id="getHotelList" resultType="Company" parameterType="string">
+		select company.* from connection,company where ota_id=#{companyId} and hotel_id=company.id
+	</select>
+	
+	<select id="getDayRoomsByCompany_idAndDateAndRoomType" resultType="DayRoom" parameterType="map">
+	select DAYROOM.id, to_char(dayroom."Date", 'YYYY.fmmm.fmfmDD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price, 	
+	DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type
+	from dayroom, room 
+	where room.type=#{roomType} 
+	and room.hotel_id=#{companyId} 
+	and room.id=dayroom.room_id 
+	and dayroom."Date">=to_date(#{curDate}, 'YYYY.fmmm.fmfmdd') and to_char(dayroom."Date", 'fmMM')=to_char(to_date(#{curDate}, 'YYYY.fmmm.fmfmdd'), 'fmMM')
+	</select>
+	
+	
+	<select id ="getReservationList" resultType="ReservationInfo2" parameterType="string">
+		select b2.name, b2.hotel_room_count, b2.tour_room_count, b2.id, to_char(b2.checkin, 'YYYY.fmmm.fmfmdd') as "checkin",  to_char(b2.checkout, 'YYYY.fmmm.fmfmdd') as "checkout", b2.type, b2.status_name
+		from (select rownum rn, b.* from (
+		select company.name, RES_GROUP.HOTEL_ROOM_COUNT, RES_GROUP.TOUR_ROOM_COUNT, RESERVATION.ID, reservation.checkin, reservation.checkout, room.type, STATUS.STATUS_NAME
+		from "USER", company, room, RESERVATION, RES_GROUP, DAYROOM, STATUS
+		where room.hotel_id=#{companyId} 
+		AND "USER".ID=RESERVATION.REG_PERSON
+		AND "USER".COMPANY_ID=COMPANY.ID
+		AND RESERVATION.ID=RES_GROUP.RESERVATION_ID
+		AND STATUS.RESERVATION_ID=RESERVATION.ID
+		AND RES_GROUP.DAYROOM_ID=DAYROOM.ID
+		AND DAYROOM.ROOM_ID=ROOM.ID order by reservation.id desc)
+		b ) b2 where 7>=b2.rn order by b2.rn asc
+	</select>
+<!-- 	private int hotel_id;
+	private String hotel_name;
+	private String room_type;
+	private int room_id; -->
+	<select id="getHotels" resultType="Hotels" parameterType="string">
+	select com.id as "hotel_id" , com.name as "hotel_name", room.type as "room_type", room.id as "room_id" from
+	(select company.* from connection, company 
+	where connection.OTA_ID=#{companyId} 
+	and connection.hotel_id=company.id) com, room where com.id=room.hotel_id
+	</select>
+	
+	<!-- <select id="getHotelsDayRooms" resultType="DayRoom" parameterType="map">
+	  select 
+	  DAYROOM.id, 
+	  to_char(dayroom."Date", 'YYYY.fmmm.fmfmDD') as "date", 
+	  DAYROOM.hotel_assign, 
+	  DAYROOM.tour_assign, 
+	  DAYROOM.price, 	
+	  DAYROOM.hotel_onoff, 
+	  DAYROOM.tour_onoff, 
+	  DAYROOM.room_id, 
+	  dayroom.rank_type 
+	  from room, dayroom where room.id=dayroom.room_id 
+ 	   <foreach collection="hotels" item="item" separator="or" open="and(" close=")">
+	  		 room.id=#{item.room_id} 
+	  </foreach>
+ 	  and dayroom."Date" 
+  	  between to_date(#{date}, 'YYYY.fmmm.fmfmdd') and to_date(#{date}, 'YYYY.fmmm.fmfmdd')+13
+	</select> -->
+	<select id="getHotelsDayRooms" resultType="DayRoom" parameterType="map">
+	  select * from	(select 
+						  DAYROOM.id, 
+						  to_char(dayroom."Date", 'YYYY.fmmm.fmfmDD') as "date", 
+						  DAYROOM.hotel_assign, 
+						  DAYROOM.tour_assign, 
+						  DAYROOM.price, 	
+						  DAYROOM.hotel_onoff, 
+						  DAYROOM.tour_onoff, 
+						  DAYROOM.room_id, 
+						  dayroom.rank_type 
+	 				 from room, dayroom where room.id=dayroom.room_id 
+					  <foreach collection="hotels" item="item" separator="or" open="and(" close=")">
+	  				 room.id=#{item.room_id} 
+					  </foreach>
+	 	  and dayroom."Date" 
+	  	  between to_date(#{date}, 'YYYY.fmmm.fmfmdd') and to_date(#{date}, 'YYYY.fmmm.fmfmdd')+13) droom, 
+	    (select SUM(RES_GROUP.TOUR_ROOM_COUNT) as sum, dayroom_id from "USER", RESERVATION, RES_GROUP, DAYROOM 
+	WHERE DAYROOM.ID=RES_GROUP.DAYROOM_ID
+	AND RES_GROUP.RESERVATION_ID=RESERVATION.ID
+	AND RESERVATION.REG_PERSON= "USER".ID
+	AND "USER".COMPANY_ID=#{companyId} GROUP BY DAYROOM_ID) rgroup where droom.id=rgroup.dayroom_id(+)
+	</select>
+	
+	<!-- 생성 : 명희 
+	 처음 세팅 모든 타입의 day룸정보 -->	
+	<select id="remainDayRoom" resultType="DayRoom" parameterType="map">
+		select DAYROOM.*
+		from DAYROOM, ROOM
+		where ROOM.HOTEL_ID=#{companyId}
+		and DAYROOM.room_id =room.id
+		and DAYROOM."Date">= #{startDate}
+		and #{endDate} > DAYROOM."Date"
+		order by DAYROOM."Date" asc
+	</select>
+	<!-- 생성 : 명희 
+	 호텔의 rank리스트 가져온다. -->	
+	<select id="takeRank" resultType="Rank" parameterType="string">
+		    select DISTINCT RANK.TYPE
+   			from room,rank
+   			where room.id = rank.room_id
+    		and room.hotel_id=#{companyId}
+			order by rank.type asc
+	</select>
+	
+	<!-- 생성 : 명희 
+	날짜와 타입을 가져와서 dayroom을 가져온다 잔여객실수알기위해 -->
+	<select id="typeRemainSetting" resultType="DayRoom" parameterType="map">
+		select dayroom.*
+		from dayroom,room 
+		where room.hotel_id=#{companyId}
+		AND room.type=#{type}
+		and room.id=dayroom.room_id
+		and DAYROOM."Date">= to_date(#{startDate}, 'YYYY-MM-DD')
+		and #{endDate} > DAYROOM."Date"
+		order by dayroom."Date" asc	
+	</select>
+	<!-- 생성 : 명희 
+	변경한 랭크의 가격을 가져온다.-->
+	<select id="choiceRank" resultType="int" parameterType="map">
+		select rank.price
+		from rank, room, dayroom
+		where ROOM.HOTEL_ID=#{companyId}
+		and DAYROOM.room_id =room.id
+		and to_char(DAYROOM."Date",'yyyy-mm-dd') = #{startDate}
+   		and room.type = #{type}
+   		and rank.room_id = room.id
+   		and rank.type = #{rankType}
+	</select>
+	<select id="getdayRoomListFirstType" resultType="DayRoom" parameterType="map">
+		select DAYROOM.id, DAYROOM."Date",DAYROOM.hotel_assign,DAYROOM.tour_assign,DAYROOM.price,DAYROOM.hotel_OnOff,DAYROOM.tour_OnOff,DAYROOM.room_id,DAYROOM.rank_type
+		from DAYROOM, ROOM, rank
+		where ROOM.HOTEL_ID=#{companyId}
+		and DAYROOM.room_id = (select dr.id from (SELECT * FROM ROOM WHERE HOTEL_ID=#{companyId} order by id asc) dr where  ROWNUM= 1 )
+		and rank.room_id= (select dr.id from (SELECT * FROM ROOM WHERE HOTEL_ID=#{companyId} order by id asc) dr where ROWNUM = 1 )
+   	 	and rank.room_id=room.id
+   		and DAYROOM."Date">= #{startDate}
+		and #{endDate} > DAYROOM."Date"
+   		and rank.type=dayroom.rank_type
+   		order by dayroom."Date" asc
+	</select>
+	<select id="getRoomsByProductId" resultType="Room" parameterType="map">
+		select room.* from product, company, room 
+		where product.company_id=company.id and company_id= room.hotel_id and product.id=#{productId}
+	</select>
+	
+	<select id="getMessageCount" resultType="int" parameterType="string">
+		select count(*) 
+		from message
+		where message."to"=#{companyId} and message."read"='no'
+	</select>
+	<select id="getCompanyMessages" resultType="Message" parameterType="string">
+		select count(*) as "count",
+		message."from" as "from", 
+    company.name as "company"
+		from message, company where message."to"=#{companyId} and company.id=message."from" group by message."from", company.name
+	</select>
+	
+	<select id="showCompanyMessageContent" resultType="Message" parameterType="map">
+	select message.id, message.title, message.content, 
+	message.fileName, message."to", message."from", message.inputdate, 
+	message."read", company.name as company from Message, company 
+	where message."from"=#{from} and message."to"=#{to}	and company.id="from" 
+	order by inputdate desc
+	</select>
+		
+		
+	<!-- 그래프	1단락 -->
+	<select id="getRoomTotalAmount" resultType="int" parameterType="String">
+		select sum(amount) from room where hotel_id=#{hotel_id}
+	</select>
+	
+	<select id="getRoomAssignAmount" resultType="hotel.vo.Graph_DateAmount" parameterType="String">
+		select (to_char(dayroom."Date",'yyyy.mm.dd')) "DATE" , (nvl(sum(dayroom.hotel_assign),0)) Amount 
+		  from dayroom, room
+		  where dayroom.room_id = room.id
+		    and room.hotel_id = #{hotel_id}
+		     GROUP BY dayroom."Date"
+		      ORDER BY dayroom."Date" ASC
+	</select>
+	
+	<!-- 2단락 -->
+	<!-- 방타입 가져오기 -->	
+	<select id="getHotelSold_RoomType" resultType="String" parameterType="String">
+		select distinct Type from room where hotel_id = #{hotel_id}
+	</select>
+	
+	<select id="getHotelSold_RoomType_Amount" resultType="hotel.vo.Graph_DateAmount" parameterType="map">
+		select (to_char(dayroom."Date",'yyyy.mm.dd')) "DATE" , (nvl(sum(res_group.hotel_room_count),0)) Amount 
+  		from reservation, res_group, dayroom, room
+  		where reservation.id = res_group.reservation_id
+		    and res_group.dayroom_id = dayroom.id
+		    and dayroom.room_id = room.id
+		    and room.hotel_id = #{hotel_id}
+		    and room.type = #{tempRoomType}
+	    GROUP BY DAYROOM."Date"
+	    ORDER BY DAYROOM."Date" ASC
+	</select>
+	
+	<!-- 3단락 -->
+	<!-- 제휴 여행사 이름 가져오기 -->	
+	<select id="getTourSold_OTA" resultType="String" parameterType="String">
+		select distinct company.name from connection,company where hotel_id=#{hotel_id}    
+	</select>
+	<!-- 여행사별, 방 타입별, 1년치 판매 수량 가져오기 -->
+	<select id="getTourSold_OTA_RoomType_Amount" resultType="hotel.vo.Graph_DateAmount" parameterType="map">
+		select (to_char(dayroom."Date",'yyyy.mm.dd')) "DATE" , (nvl(sum(res_group.tour_room_count),0)) Amount 
+		  from company, "USER", reservation, res_group, dayroom, room
+		  where company.id = "USER".company_id
+		    and "USER".id = reservation.reg_person
+		    and reservation.id = res_group.reservation_id
+		    and res_group.dayroom_id = dayroom.id
+		    and dayroom.room_id = room.id
+		    and room.hotel_id = #{hotel_id}
+		    and room.type = #{tempRoomType}
+		    and company.name = #{tempOtaName}
+		    GROUP BY dayroom."Date"
+		    ORDER BY dayroom."Date" ASC   
+	</select>
+	<!-- 4단락
+	여행사의 남은 수량 -->
+	<select id="getTourRemain" resultType="hotel.vo.Graph_DateAmount" parameterType="String">
+		select (to_char(dayroom."Date",'yyyy.mm.dd')) "DATE" , (nvl(sum(dayroom.tour_assign),0)) Amount 
+		  from dayroom, room
+		  where dayroom.room_id = room.id
+		    and room.hotel_id = #{hotel_id}
+		     GROUP BY dayroom."Date"
+		      ORDER BY dayroom."Date" ASC   
+	</select>	
+	
+	<!-- 자기 호텔 이름 가져오기 -->
+	<select id="getHotel_Name" resultType="String" parameterType="String">
+		select name from company where id = #{hotel_id}
+	</select>
+	
+</mapper>
+

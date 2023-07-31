@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <package name="pageMove" namespace="/pageMove" extends="default">
+    	
+    	<action name="showCompanyMessageContent" class="hotel.ajax.ShowCompanyMessageContentAjax" method="showCompanyMessageContent">
+    		<result type="json"></result>
+    	</action>
+    	<action name="takeCompanyMessage" class="hotel.ajax.TakeCompanyMessageAjax" method="takeCompanyMessage">
+    		<result type="json"></result>
+    	</action>
+    	<action name="takeMessageCount" class="hotel.ajax.TakeMessageCountAjax" method="takeMessageCount">
+    		<result type="json"></result>
+    	</action>
+    	<action name="goFirstStep" class="hotel.action.PageMoveAction" method="goFirstStep">
+    		<result name="success">/jsp/init/firstStep.jsp</result>
+    	</action>
+    		<action name="sendMessage" class="hotel.ajax.SendMessageAjax" method="sendMessage">
+    		<result type="json"></result>
+    	</action>
+    	<action name="goMainPage" class="hotel.action.PageMoveAction" method="goMainPage">
+    		<result name="TM">/jsp/mainPages/tour.jsp</result>
+    		<result name="HM">/jsp/mainPages/hotelManager.jsp</result>
+    		<result name="HS">/jsp/mainPages/hotelManager.jsp</result>
+    	</action>
+    	<action name="goRoomWork" >
+    		<result name="success">/jsp/roomWork/roomWork.jsp</result>
+    	</action>
+    	<action name="goRoomInfo" >
+    		<result name="success">/jsp/roomWork/roomWork2.jsp</result>
+    	</action>
+    	<action name="goReservationTourWork" class="hotel.action.PageMoveAction" method="goReservationTourWork">
+    		<result type="json"></result>
+    	</action>
+    	
+    	<action name="takeThirdStepInfo" class="hotel.ajax.TakeThirdStepInfoAjax" method="takeThirdStepInfo">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="takePriceInfo" class="hotel.ajax.TakePriceInfoAjax" method="takePriceInfo">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="takeSimpleCalendar" class="hotel.ajax.UpdateMainAjax" method="takeSimpleCalendar">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="takeADayRoomInfo" class="hotel.ajax.TakeADayRoomInfoAjax" method="takeADayRoomInfo">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="pageMoveToNext" class="hotel.ajax.UpdateMainAjax" method="pageMoveToNext">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="pageMoveToPrev" class="hotel.ajax.UpdateMainAjax" method="pageMoveToPrev">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="selectTypeForSearch" class="hotel.ajax.UpdateMainAjax" method="selectTypeForSearch">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="goReservationWork" class="hotel.action.PageMoveAction" method="goReservationWork">
+    		<result name="success">/jsp/reservationWork/reservationWork.jsp</result>
+    	</action>  
+        <action name="takeCalendarDayRooms" class="hotel.ajax.TakeCalendarDayRoomsAjax" method="takeCalendarDayRooms">
+    		<result type="json"></result>
+    	</action> 
+    	 <action name="takeNextMonthOnReservation" class="hotel.ajax.TakeNextMonthOnReservationAjax" method="takeNextMonthOnReservation">
+    		<result type="json"></result>
+    	</action> 
+    	 <action name="takeNextMonthOnTourReservation" class="hotel.ajax.TakeNextMonthOnTourReservationAjax" method="takeNextMonthOnTourReservation">
+    		<result type="json"></result>
+    	</action> 
+    	
+    	 <action name="takeSelectedDateCal" class="hotel.ajax.TakeSelectedDateCalAjax" method="takeSelectedDateCal">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="takePrevMonthOnReservation" class="hotel.ajax.TakePrevMonthOnReservationAjax" method="takePrevMonthOnReservation">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="takePrevMonthOnTourReservation" class="hotel.ajax.TakePrevMonthOnTourReservationAjax" method="takePrevMonthOnTourReservation">
+    		<result type="json"></result>
+    	</action> 
+    	
+    	<action name="showReservationForm" class="hotel.ajax.ShowReservationFormAjax" method="showReservationForm">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="showReservationFormInMain" class="hotel.ajax.ShowReservationFormAjax" method="showReservationFormInMain">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="showReservationFormForTour" class="hotel.ajax.ShowReservationFormForTourAjax" method="showReservationFormForTour">
+    		<result type="json"></result>
+    	</action> 
+    	
+    	
+    	 <action name="goProductWork" class="hotel.action.PageMoveAction" method="goProductWork">
+    		<result name="success">/jsp/productWork/productWork.jsp</result>
+    	</action>  
+    	<action name="showDetail" class="hotel.action.PageMoveAction" method="showDetail">
+    		<result name="success">/jsp/productWork/productDetail.jsp</result>
+    	</action> 
+    	
+    	<action name="goBookProduct" class="hotel.action.PageMoveAction" method="goBookProduct">
+    		<result name="success">/jsp/reservationWork/reservationProductWork.jsp</result>
+    	</action> 
+    	<action name="productSelected" class="hotel.ajax.ProductSelectedAjax" method="productSelected">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="typeSelected" class="hotel.ajax.TypeSelectedAjax" method="typeSelected">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="showReservationFormForProduct" class="hotel.ajax.ShowReservationFormAjax" method="showReservationFormForProduct">
+    		<result type="json"></result>
+    	</action> 
+    	
+    	<action name="goReservationForm" class="hotel.action.PageMoveAction" method="goReservationForm">
+    		<result name="success">/jsp/reservationWork/reservationForm.jsp</result>
+    	</action> 
+    	<action name="goReservationFormForProduct" class="hotel.action.PageMoveAction" method="goReservationForm">
+    		<result name="success">/jsp/reservationWork/reservationForm.jsp</result>
+    	</action> 
+    	<action name="goBookInfo" class="hotel.action.PageMoveAction" method="goBookInfo">
+    		<result name="success">/jsp/reservationWork/reservationInfo.jsp</result>
+    	</action> 
+    	<action name="showProduct" class="hotel.ajax.SelectReservationInfoTourAjax" method="showProduct">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="showTypes" class="hotel.ajax.SelectReservationInfoTourAjax" method="showTypes">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="takeDate" class="hotel.ajax.TakeDateAjax" method="takeDate">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="showAvailableCal" class="hotel.ajax.ShowAvailableCalAjax" method="showAvailableCal">
+    		<result type="json"></result>
+    	</action> 
+    	
+    	<action name="goProductForm" class="hotel.action.PageMoveAction" method="goProductWork">
+    		<result>/jsp/productWork/productForm.jsp</result>
+    	</action> 
+    	<!-- //싱미 / 사용자정의 No:ho-fro-049 / 05010(일 am1:00) 방예약한 데이터 출력-->
+    	<action name="reservationSearch" class="hotel.ajax.ReservationSearchAjaxSM" method="reservationSearch">
+    	 	<result type="json"></result>
+    	</action>
+    	
+    	<!-- //싱미 / 사용자정의 No:ho-fro-051/ 0511(월 am11:00)예약한 날자로  방예약한 검색-->
+    	<action name="ReservationSeachButton" class="hotel.ajax.ReservationSearchAjaxSM" method="reservationSeachButton">
+    		<result type="json"></result>
+    	</action>
+    	
+    	<!--  //싱미 / 사용자정의 No:ho-fro-051/ 051(화 am11:00)예약한 날자로  방예약한 검색 -->
+    	<action name="checkinCheckoutSearch" class="hotel.ajax.ReservationSearchAjaxSM" method="checkinCheckoutSearch">
+    		<result type="json"></result>
+    	</action>
+    	
+    	<!-- 사람으로 검색하기 -->
+    	<action name="personReservationSearch" class="hotel.ajax.ReservationSearchAjaxSM" method="personReservationSearch">
+    		<result type="json"></result>
+    	</action>
+    	
+    	<action name="takeReservationInfoForMain" class="hotel.ajax.TakeReservationInfoForMainAjax" method="takeReservationInfoForMain">
+    		<result type="json"></result>
+    	</action>
+    	
+    	<action name="renewHotelDateAfterChangeType" class="hotel.ajax.RenewHotelDateAfterChangeTypeAjax" method="renewHotelDateAfterChangeType">
+    		<result type="json"></result>
+    	</action>
+    	<!--생성: 명희 들어가자마자 세팅-->
+    	<action name="priceWorkInfo" class="hotel.ajax.PriceWorkAjax" method="priceWorkInfo">
+    		<result type="json"></result>
+    	</action>
+    	<!-- 생성: 명희 타입버튼 누르면 잔여객실 바뀐다. -->
+    	<action name="typeRemainSetting" class="hotel.ajax.PriceWorkAjax" method="typeRemainSetting">
+    		<result type="json"></result>
+    	</action>
+    	<!-- 생성:명희 수정한다 가격과 랭크를 -->
+    	<action name="modifyPriceAndRank" class="hotel.ajax.PriceWorkAjax" method="modifyPriceAndRank">
+    		<result type="json"></result>
+    	</action>
+    	<action name="goPriceWork" >
+    		<result name="success">/jsp/priceWork/priceWork.jsp</result>
+    	</action>
+    	<action name="goGraphAction" class="hotel.action.GraphAction" method="callRoomGraphData">
+    		<result name="success">/jsp/graph/RoomGraph.jsp</result>
+    	</action>  
+    </package>
+</struts>
+

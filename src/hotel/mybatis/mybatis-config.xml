@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- DB접속정보 값을 가지고 있는 파일 설정 -->
+	<properties resource="hotel/mybatis/db.properties" />
+		<typeAliases>
+			<typeAlias alias="User" type="hotel.vo.User"/>
+			<typeAlias alias="Company" type="hotel.vo.Company"/>
+			<typeAlias alias="Connection" type="hotel.vo.Connection"/>
+			<typeAlias alias="Room" type="hotel.vo.Room"/>
+			<typeAlias alias="Rank" type="hotel.vo.Rank"/>
+			<typeAlias alias="DayRoom" type="hotel.vo.DayRoom"/>
+			<typeAlias alias="ReservationInfo" type="hotel.vo.ReservationInfo"/>
+			<typeAlias alias="Reservation" type="hotel.vo.Reservation"/>
+			<typeAlias alias="Res_Group" type="hotel.vo.Res_Group"/>
+			<typeAlias alias="Product" type="hotel.vo.Product"/>
+			<typeAlias alias="Image" type="hotel.vo.Image"/>
+			<typeAlias alias="RoomRank" type="hotel.vo.RoomRank"/>
+			<typeAlias alias="ReservationInfo2" type="hotel.vo.ReservationInfo2"/>
+			<typeAlias alias="Hotels" type="hotel.vo.Hotels"/>
+			<typeAlias alias="Message" type="hotel.vo.Message"/>
+			<typeAlias alias="Graph_DateAmount" type="hotel.vo.Graph_DateAmount"/>
+			
+		</typeAliases>
+	<!-- DB접속 정보 셋팅 -->
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+		<mapper resource="hotel/mybatis/selectMapper.xml" />
+		<mapper resource="hotel/mybatis/insertMapper.xml" />
+		<mapper resource="hotel/mybatis/updateMapper.xml" />
+		<mapper resource="hotel/mybatis/deleteMapper.xml" />
+	</mappers>
+	
+</configuration>

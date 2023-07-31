@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hotel.mybatis.updateMapper">
+	<update id="updatePassword" parameterType="User">
+		update "USER" set pw=#{pw} where id=#{id}
+	</update>
+	<update id="completeCompanySetting" parameterType="string">
+		update company set InfoCompleted='true' where id=#{companyId}
+	</update>
+	<!-- 생성:김명히히
+	요금, 랭크 수정 -->
+	<update id="modifyPriceAndRank" parameterType="map">
+		UPDATE dayroom a SET a.RANK_TYPE = #{rankType}, a.price= #{price}
+ 		WHERE a.ROOM_ID IN (SELECT b.id FROM room b WHERE b.id = a.room_id and b.type=#{type} and b.hotel_id=#{companyId})
+ 		and to_char(a."Date",'yyyy-mm-dd') = #{startDate}
+	</update>
+	<!-- 생셩:김명희
+	요금 수정 -->
+	<update id="changePrice" parameterType="map">
+		UPDATE dayroom a SET a.price= #{price}
+ 		WHERE a.ROOM_ID IN (SELECT b.id FROM room b WHERE b.id = a.room_id and b.type=#{type} and b.hotel_id=#{companyId})
+ 		and to_char(a."Date",'yyyy-mm-dd') = #{startDate}
+	</update>
+</mapper>
+

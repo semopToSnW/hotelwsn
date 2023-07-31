@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hotel.mybatis.selectMapper">
+	<select id="getUser" parameterType="string" resultType="User">	
+		select * from "USER" where id=#{id}
+	</select>
+	<select id="getUserNumber" parameterType="string" resultType="int">	
+		select SUBSTR(ID, 3,5)+1 from "USER" WHERE id LIKE #{type} AND ROWNUM=1 ORDER BY ID DESC
+	</select>
+	<select id="getCompanyNumber" parameterType="string" resultType="int">	
+		select SUBSTR(ID, 3,5)+1 from COMPANY WHERE id LIKE #{type} AND ROWNUM=1 ORDER BY ID DESC
+	</select>
+	<select id="selectAllTour" resultType="Company">	
+		select * from company where id like 'TC%'
+	</select>
+	<select id="searchCompany" resultType="Company" parameterType="map">	
+		select * from company where name like #{name} and id like #{type}
+	</select>
+	<select id="searchCompanyById" resultType="Company" parameterType="string">	
+		select * from company where id=#{id}
+	</select>
+	<select id="searchRoom" resultType="Room" parameterType="string">
+		select room.* from (select * from "USER" where company_id=#{companyId}) u, room where u.company_id = room.hotel_id
+	</select>
+	<select id="searchRank" resultType="Rank" parameterType="int">
+			select * from (select * from room where id=#{roomId}) s, rank where rank.room_id = s.id
+	</select>
+	<select id="searchDayroom" resultType="DayRoom" parameterType="int">
+		select * from (select * from room where id=#{roomId}) s, dayroom where s.id = dayroom.room_id
+	</select>
+	<select id="getRanksByCompany_id" resultType="Rank" parameterType="string">
+			SELECT RANK.* FROM RANK, ROOM WHERE ROOM.HOTEL_ID=#{companyID} AND RANK.ROOM_ID=ROOM.ID
+	</select>
+	<select id="getRoomsByCompany_id" resultType="Room" parameterType="string">
+			SELECT * FROM ROOM WHERE HOTEL_ID=#{companyID}
+	</select>
+	<select id="getHotelRanksNumber" resultType="string" parameterType="string">
+			select DISTINCT RANK.TYPE from room, rank where room.hotel_id=#{companyID} AND RANK.ROOM_ID=ROOM.ID ORDER BY RANK.TYPE ASC
+	</select>
+	<select id="getRanksByTypeAndHotelId" resultType="Rank" parameterType="map">
+		select rank.* from rank, (select * from room where type=#{roomType} and hotel_id=#{companyId}) a where a.id=rank.ROOM_ID  order by rank.type asc
+	</select>
+	<!-- 생성:재학 
+	호텔 측 로그인 후 보여질 첫 화면의 3달치 날짜별 정보-->
+	<select id="getSimpleCarendar" parameterType="hashmap" resultType="DayRoom">			
+		select DAYROOM.id, to_char(dayroom."Date", 'YYYY.mm.DD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price, 	
+		DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type, ROOM.TYPE ROOM_TYPE from DAYROOM, ROOM, COMPANY 
+		where DAYROOM.ROOM_ID = ROOM.ID AND ROOM.HOTEL_ID=COMPANY.ID AND COMPANY.ID=#{hotel_id} 
+		AND ROOM.TYPE=#{room_type}
+		AND "Date">=#{startMonth} AND (ADD_MONTHS(#{startMonth},3))>"Date"
+	</select>
+	<!-- 생성:재학 
+	호텔이 가지고 있는 방 타입을 반환-->		
+	<select id="getRoomType" parameterType="string" resultType="string">	
+		SELECT TYPE FROM ROOM WHERE HOTEL_ID=#{hotel_id}
+	</select>
+	<!-- 생성:재학 
+	호텔과 제휴 맺은 여행사 목록을 반환-->	
+	<select id="getOTAList" parameterType="string" resultType="string">	
+		SELECT OTA_ID FROM CONNECTION WHERE HOTEL_ID=#{hotel_id}
+	</select>
+	
+	<select id="getDayRoomsByCompany_idAndMonth" resultType="DayRoom" parameterType="map">
+		SELECT DAYROOM.id, to_char(dayroom."Date", 'YYYY.mm.DD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price, 	
+		DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type 
+		FROM DAYROOM, ROOM WHERE DAYROOM.ROOM_ID=ROOM.ID AND ROOM.HOTEL_ID=#{companyId} AND to_char(dayroom."Date", 'MM')=#{month}
+	</select>
+	 <select id="getDayRoomsDatesAndTypesByCompany_idAndMonth" resultType="DayRoom" parameterType="map">
+		select distinct "date", rank_type from (SELECT DAYROOM.id, to_char(dayroom."Date", 'YYYY.mm.DD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price, 	
+		DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type 
+		FROM DAYROOM, ROOM WHERE DAYROOM.ROOM_ID=ROOM.ID AND ROOM.HOTEL_ID=#{companyId} AND to_char(dayroom."Date", 'YYYY')=#{year} AND to_char(dayroom."Date", 'MM')=#{month}) dr
+	</select>  
+	<select id="selectCompany" resultType="Company" parameterType="String">
+		select * from company where id=#{companyId}
+	</select>
+	
+<!-- 	<select id="selectResInit" resultType ="ResInit" parameterType="map">
+		 select room.HOTEL_ID, room."TYPE", DAYROOM."Date", dayroom.rank_type, rank.price 
+		 from dayroom, rank, room
+    		where room.id=dayroom.ROOM_ID 
+         	and room.HOTEL_ID=${companyId} 
+          	and rank.ROOM_ID=room.id
+         	and rank.type=dayroom.rank_type and 
+         	<foreach collection="dayRoomList" item="droom" separator="or" open="(" close=")">
+         	 DAYROOM."Date"=%{droom.date}
+         	</foreach>
+   		order by room."TYPE" asc;	
+	</select> -->
+	
+	<select id="getADayRoom" resultType="DayRoom" parameterType="string">
+		select * from dayRoom where id=#{dayRoomId}
+	</select>
+	
+	<select id="getDayRoomsByCompany_idAndMonthAndRoomType" resultType="DayRoom" parameterType="map">
+		select distinct "date", id, type as "room_type", rank_type, hotel_assign, tour_assign, hotel_onoff, tour_onoff from 
+		(SELECT DAYROOM.id, room.type, to_char(dayroom."Date", 'YYYY.fmMM.fmfmDD') as "date", DAYROOM.hotel_assign, DAYROOM.tour_assign, DAYROOM.price,DAYROOM.hotel_onoff, DAYROOM.tour_onoff, DAYROOM.room_id, dayroom.rank_type 
+		FROM DAYROOM, ROOM WHERE DAYROOM.ROOM_ID=ROOM.ID AND ROOM.HOTEL_ID=#{companyId} AND to_char(dayroom."Date", 'YYYY')=#{year} AND to_char(dayroom."Date", 'fmMM')=#{month} and
+		<foreach collection="types" item="item" separator="or" open="(" close=")">
+			room.type=#{item.type} 
+		</foreach>	
+		) dr	
+	</select>
+	
+	<select id="getReservationInit" resultType="ReservationInfo" parameterType="map">
+	select dayroom.id as "dayroom_id", to_char(dayroom."Date", 'YYYY.fmMM.fmfmDD') as "Date", room.persons, room.type as "room_type", ra.type as "rank_type", ra.price, dayroom.hotel_assign 
+	from dayroom, room, 
+  	(select rank.type, rank.price, rank.room_id from rank, 
+      (select ID from room where hotel_id=#{companyId} AND 
+      <foreach collection="roomList" item="item" separator="or" open="(" close=")">
+	  		TYPE=#{item.type}
+	  </foreach>	     
+      )ro where rank.room_id = ro.id) ra 
+	where room.id=ra.room_id and ra.room_id=dayroom.room_id and dayroom.rank_type=ra.type AND 
+	  <foreach collection="dateList" item="item" separator="or" open="(" close=")">
+	  	to_char(DAYROOM."Date", 'YYYY.fmmm.fmfmDD')=#{item}
+	  </foreach>
+	  order by dayroom."Date" asc
+	</select>
+	
+	<select id="getOnlyRankTypesByCompanyId" resultType="Rank" parameterType="string">
+		select DISTINCT rank.TYPE from rank, room where room.hotel_id=#{companyId} AND ROOM.ID=RANK.ROOM_ID
+	</select>
+
+	<select id="getReservationInitInMain" resultType="ReservationInfo" parameterType="int">
+	select dayroom.id as "dayroom_id", to_char(dayroom."Date", 'YYYY.fmMM.fmfmDD') as "Date", room.persons, room.type as "room_type", rank.type as "rank_type", rank.price, dayroom.hotel_assign 
+	from dayroom, room, rank
+	where room.id=rank.room_id 
+	and rank.room_id=dayroom.room_id 
+	and dayroom.rank_type=rank.type 
+	AND dayroom.id=#{dayRoomId}
+	</select>
+		<select id="getImage" resultType="Image" parameterType="String">
+		select * from image where product_id=#{product_id}
+	</select>
+	
+	<select id="getProduct" resultType="Product">
+		  select id, name, explain, mealtypes, checkintime, checkouttime, amount, prices, roomtypes, company_id, to_char(salestart, 'YYYY.fmmm.fmfmDD') as salestart, to_char(salefinish, 'YYYY.fmMM.fmfmDD') as salefinish 
+		  from product where company_id=#{companyId}
+	</select>
+	
+	
+	<select id="getProductById" resultType="Product">
+		select id, name, explain, mealtypes, checkintime, checkouttime, amount, prices, roomtypes, company_id, to_char(salestart, 'YYYY.fmmm.fmfmDD') as salestart, to_char(salefinish, 'YYYY.fmMM.fmfmDD') as salefinish 
+		  from product where id=#{id}
+	</select>
+	
+<!-- 	getDayRoomsByDayRoomIds -->
+</mapper>
+

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <package name="pageMove" namespace="/pageMove" extends="default">
+    	<action name="goFirstStep" class="hotel.action.PageMoveAction" method="goFirstStep">
+    		<result name="success">/jsp/init/firstStep.jsp</result>
+    	</action>
+    	
+    	<action name="goMainPage" class="hotel.action.PageMoveAction" method="goMainPage">
+    		<result name="TM">/jsp/mainPages/tour.jsp</result>
+    		<result name="HM">/jsp/mainPages/hotelManager.jsp</result>
+    		<result name="HS">/jsp/mainPages/hotelManager.jsp</result>
+    	</action>
+    	
+    	<action name="takeThirdStepInfo" class="hotel.ajax.TakeThirdStepInfoAjax" method="takeThirdStepInfo">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="takePriceInfo" class="hotel.ajax.TakePriceInfoAjax" method="takePriceInfo">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="takeSimpleCalendar" class="hotel.ajax.UpdateMainAjax" method="takeSimpleCalendar">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="takeADayRoomInfo" class="hotel.ajax.TakeADayRoomInfoAjax" method="takeADayRoomInfo">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="pageMoveToNext" class="hotel.ajax.UpdateMainAjax" method="pageMoveToNext">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="pageMoveToPrev" class="hotel.ajax.UpdateMainAjax" method="pageMoveToPrev">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="selectTypeForSearch" class="hotel.ajax.UpdateMainAjax" method="selectTypeForSearch">
+    		<result type="json"></result>
+    	</action>
+    	 <action name="goReservationWork" class="hotel.action.PageMoveAction" method="goReservationWork">
+    		<result name="success">/jsp/reservationWork/reservationWork.jsp</result>
+    	</action>  
+        <action name="takeCalendarDayRooms" class="hotel.ajax.TakeCalendarDayRoomsAjax" method="takeCalendarDayRooms">
+    		<result type="json"></result>
+    	</action> 
+    	 <action name="takeNextMonthOnReservation" class="hotel.ajax.TakeNextMonthOnReservationAjax" method="takeNextMonthOnReservation">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="takePrevMonthOnReservation" class="hotel.ajax.TakePrevMonthOnReservationAjax" method="takePrevMonthOnReservation">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="showReservationForm" class="hotel.ajax.ShowReservationFormAjax" method="showReservationForm">
+    		<result type="json"></result>
+    	</action> 
+    	<action name="showReservationFormInMain" class="hotel.ajax.ShowReservationFormAjax" method="showReservationFormInMain">
+    		<result type="json"></result>
+    	</action> 
+    	 <action name="goProductWork" class="hotel.action.PageMoveAction" method="goProductWork">
+    		<result name="success">/jsp/productWork/productWork.jsp</result>
+    	</action>  
+    	<action name="showDetail" class="hotel.action.PageMoveAction" method="showDetail">
+    		<result name="success">/jsp/productWork/productDetail.jsp</result>
+    	</action> 
+    	
+    </package>
+</struts>
+

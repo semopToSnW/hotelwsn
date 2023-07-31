@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <package name="update" namespace="/update" extends="default">
+     	<action name="updateFirstStep" class="hotel.ajax.UpdateFirstStepAjax" method="updateFirstStep">
+    		<result name="success" type="json"></result>
+    	</action>
+    	 <action name="updateFirstStepAndGo" class="hotel.action.UpdateAction" method="updateFirstStep">
+    		<result name="success">/jsp/init/secondStep.jsp</result>
+    	</action>
+    	<action name="updateSecondStep" class="hotel.ajax.UpdateSecondStepAjax" method="updateSecondStep">
+    		<result name="success" type="json"></result>
+    	</action>
+    	<action name="updateSecondStepAndGo" class="hotel.action.UpdateAction" method="updateSecondStep">
+    		<result name="success">/jsp/init/finalStep.jsp</result>
+    	</action>
+  		 <action name="updateFinalStep"  class="hotel.ajax.UpdateFinalStepAjax" method="updateFinalStep">
+    		<result type="json"></result>            
+    	</action> 
+		<action name="updateFinalStepAndGo"  class="hotel.action.UpdateAction" method="updateFinalStep">
+    		<result name="success">/jsp/mainPages/hotel.jsp</result>
+    	</action>
+    	<action name="takeSimpleCalendar" class="hotel.ajax.UpdateMainAjax" method="takeSimpleCalendar">
+    		<result type="json"></result>  		
+    	</action>
+    	<action name="completeInit"  class="hotel.action.UpdateAction" method="completeInit">
+    		<result name="success">/jsp/mainPages/hotelManager.jsp</result>
+    	</action>   
+       <action name="book"  class="hotel.ajax.BookAjax" method="book">
+    		<result type="json"></result>
+    	</action>  
+    	
+    	<action name="UpdateProductImage" class="hotel.ajax.UpdateProductAjax" method="updateProductImage">
+    		<result type="json"></result>
+    	</action>
+    	<action name="downImage" class="hotel.ajax.UpdateProductAjax" method="downImage">    		
+    		 <result type="stream">
+				<param name="contentType">text/plain</param> 
+				<param name="contentLength">${contentLength}</param>
+				<param name="contentDisposition">${contentDisposition}</param>
+				<param name="inputName">inputStream</param>
+				<param name="bufferSize">4096</param>
+			</result>
+    	</action>
+    	<action name="downExcel" class="hotel.ajax.UpdateProductAjax" method="downExcel">
+    		<result type="stream">
+				<param name="contentType">text/plain</param> 
+				<param name="contentLength">${contentLength}</param>
+				<param name="contentDisposition">${contentDisposition}</param>
+				<param name="inputName">inputStream</param>
+				<param name="bufferSize">4096</param>
+			</result>
+    	</action>
+    </package>
+</struts>
+
